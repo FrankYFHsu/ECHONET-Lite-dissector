@@ -56,6 +56,8 @@ function edata.dissector(buffer, pinfo, tree)
     seojtree:add(edata.fields.seojclass, buffer(1, 1), buffer(1,1):uint(), "Class code:", sobj, string.format("(0x%02x)", buffer(1,1):uint()))
     seojtree:add(edata.fields.seojinstance, buffer(2, 1))
 
+    local sobjCode = string.format("%02X%02X%02X", buffer(0, 1):uint(),buffer(1, 1):uint(),buffer(2, 1):uint())
+
     local dobj = "Unknown"
     if list.class[buffer(3,1):uint()] ~= nil and list.class[buffer(3,1):uint()][buffer(4,1):uint()] ~= nil then
         dobj = list.class[buffer(3,1):uint()][buffer(4,1):uint()]
@@ -66,6 +68,7 @@ function edata.dissector(buffer, pinfo, tree)
     deojtree:add(edata.fields.deojgroup, buffer(3, 1))
     deojtree:add(edata.fields.deojclass, buffer(4, 1), buffer(4,1):uint(), "Class code:", dobj, string.format("(0x%02x)", buffer(4,1):uint()))
     deojtree:add(edata.fields.deojinstance, buffer(5, 1))
+    local dobjCode = string.format("%02X%02X%02X", buffer(3, 1):uint(),buffer(4, 1):uint(),buffer(5, 1):uint())
 
     subtree:add(edata.fields.esv,  buffer(6, 1))
     subtree:add(edata.fields.opc,  buffer(7, 1))
@@ -91,5 +94,5 @@ function edata.dissector(buffer, pinfo, tree)
     end
     props = string.gsub(props, "^,", ", EPC=")
 
-    pinfo.cols.info = string.format("%s → %s, %s%s", sobj, dobj, esv, props)
+    pinfo.cols.info = string.format("%s(%s) → %s(%s), %s%s", sobj, sobjCode, dobj, dobjCode, esv, props)
 end
